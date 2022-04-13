@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +20,15 @@ const (
 	passwordReg string = "[A-Z]+[a-z]+[^a-zA-Z]{2,}"
 )
 
-var db *sql.DB
+var (
+	db     *sql.DB
+	jwtKey = []byte("secret_key_example")
+)
+
+type Claims struct {
+	Login string `json:"login" db:"login"`
+	jwt.StandardClaims
+}
 
 type Users struct {
 	Login      *string `json:"login,omitempty" db:"login"`
@@ -97,6 +106,18 @@ func signUpHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	claims := &Claims{
+		Login: *users.Login,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodH256, claims)
+
+	log.Println(token)
 	fmt.Fprintf(w, "Sign Up")
 }
 
@@ -104,9 +125,14 @@ func signInHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Sign In")
 }
 
+func verifierHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "Verified")
+}
+
 func main() {
 	http.HandleFunc("/signup", signUpHandler)
 	http.HandleFunc("/signin", signInHandler)
+	http.HandleFunc("/verify", verifierHandler)
 
 	initDB()
 
