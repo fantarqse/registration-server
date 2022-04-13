@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -115,9 +116,14 @@ func signUpHandler(w http.ResponseWriter, req *http.Request) {
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodH256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, _ := token.SignedString(jwtKey)
 
-	log.Println(token)
+	_, err = http.Get("http://127.0.0.1:8000/verify?token=" + tokenString)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	fmt.Fprintf(w, "Sign Up")
 }
 
@@ -126,6 +132,33 @@ func signInHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func verifierHandler(w http.ResponseWriter, req *http.Request) {
+	tokenArr := strings.Split(req.RequestURI, "=")
+	tokenString := tokenArr[1]
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwtKey, nil
+	})
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		res, err := db.Exec("update users set is_verified = true where login = $1", claims["login"])
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		count, _ := res.RowsAffected()
+		if count <= 0 {
+			log.Println("not updated")
+		}
+
+		log.Println("Verified")
+
+	} else {
+		log.Println(err)
+	}
+
 	fmt.Fprintf(w, "Verified")
 }
 
