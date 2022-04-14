@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	emailReg    string = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-	passwordReg string = "[A-Z]+[a-z]+[^a-zA-Z]{2,}"
+	emailReg      string = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+	passwordReg   string = "[A-Z]+[a-z]+[^a-zA-Z]{2,}"
+	authorization string = "Authorization"
 )
 
 var (
@@ -31,30 +32,50 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-type Users struct {
+type SignUpUser struct {
 	Login      *string `json:"login,omitempty" db:"login"`
 	Password   *string `json:"password,omitempty" db:"password"`
 	Email      *string `json:"email,omitempty" db:"email"`
 	IsVerified bool    `json:"isVerified,omitempty" db:"is_verified"`
 }
 
-func (u Users) validator() error {
+func (user SignUpUser) validator() error {
 	email := regexp.MustCompile(emailReg)
 	password := regexp.MustCompile(passwordReg)
 
-	if len(*u.Login) < 3 {
+	if len(*user.Login) < 3 {
 		log.Println("Login is not valid!")
 		return errors.New("error: login is too short")
 	}
 
-	if len(*u.Password) < 8 || !password.MatchString(*u.Password) {
+	if len(*user.Password) < 8 || !password.MatchString(*user.Password) {
 		log.Println("Password is not valid!")
 		return errors.New("error: password is not valid")
 	}
 
-	if !email.MatchString(*u.Email) {
+	if !email.MatchString(*user.Email) {
 		log.Println("Email is not valid!")
 		return errors.New("error: email is not valid")
+	}
+	return nil
+}
+
+type SignInUser struct {
+	Login    *string `json:"login,omitempty" db:"login"`
+	Password *string `json:"password,omitempty" db:"password"`
+}
+
+func (user SignInUser) validator() error {
+	password := regexp.MustCompile(passwordReg)
+
+	if len(*user.Login) < 3 {
+		log.Println("Login is not valid!")
+		return errors.New("error: login is too short")
+	}
+
+	if len(*user.Password) < 8 || !password.MatchString(*user.Password) {
+		log.Println("Password is not valid!")
+		return errors.New("error: password is not valid")
 	}
 	return nil
 }
@@ -69,17 +90,46 @@ func initDB() {
 	log.Println("DB connected!")
 }
 
+func JWTVerifier(tokenString string) (jwt.MapClaims, bool, bool) {
+	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwtKey, nil
+	})
+	valid := token.Valid
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	return claims, ok, valid
+}
+
+func JWTGenerator(data string) (string, time.Time, error) {
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	claims := &Claims{
+		Login: data,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+
+	return tokenString, expirationTime, err
+}
+
 func signUpHandler(w http.ResponseWriter, req *http.Request) {
-	users := &Users{}
+	users := &SignUpUser{}
 	err := json.NewDecoder(req.Body).Decode(users)
 	if err != nil {
 		http.Error(w, "Bad request: JSON is not valid", 400)
 		return
 	}
 
-	validationErr := users.validator()
-	if validationErr != nil {
-		http.Error(w, validationErr.Error(), 400)
+	err = users.validator()
+	if err != nil {
+		http.Error(w, err.Error(), 400)
 		return
 	}
 
@@ -107,42 +157,65 @@ func signUpHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	expirationTime := time.Now().Add(5 * time.Minute)
-
-	claims := &Claims{
-		Login: *users.Login,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(jwtKey)
-
-	_, err = http.Get("http://127.0.0.1:8000/verify?token=" + tokenString)
+	tokenString, _, err := JWTGenerator(*users.Login)
 	if err != nil {
-		log.Fatalln(err)
+		http.Error(w, err.Error(), 500)
+		return
 	}
+	w.Header().Add(authorization, tokenString)
 
 	fmt.Fprintf(w, "Sign Up")
 }
 
 func signInHandler(w http.ResponseWriter, req *http.Request) {
+	user := &SignInUser{}
+	storedUser := &SignInUser{}
+
+	err := json.NewDecoder(req.Body).Decode(user)
+	if err != nil {
+		http.Error(w, "Bad request: JSON is not valid", 500)
+		return
+	}
+
+	err = user.validator()
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	result := db.QueryRow("select password from users where login=$1", user.Login)
+
+	err = result.Scan(&storedUser.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, err.Error(), 401)
+			return
+		}
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(*storedUser.Password), []byte(*user.Password))
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	tokenString, _, err := JWTGenerator(*user.Login)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.Header().Add(authorization, tokenString)
+
 	fmt.Fprintf(w, "Sign In")
 }
 
-func verifierHandler(w http.ResponseWriter, req *http.Request) {
-	tokenArr := strings.Split(req.RequestURI, "=")
-	tokenString := tokenArr[1]
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return jwtKey, nil
-	})
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+func verifyHandler(w http.ResponseWriter, req *http.Request) {
+	token := req.Header.Get(authorization)
+	claims, ok, valid := JWTVerifier(token)
+	if ok && valid {
 		res, err := db.Exec("update users set is_verified = true where login = $1", claims["login"])
 		if err != nil {
 			log.Println(err.Error())
@@ -151,12 +224,11 @@ func verifierHandler(w http.ResponseWriter, req *http.Request) {
 		count, _ := res.RowsAffected()
 		if count <= 0 {
 			log.Println("not updated")
+		} else {
+			log.Println("verified")
 		}
-
-		log.Println("Verified")
-
 	} else {
-		log.Println(err)
+		log.Println("Token is not valid")
 	}
 
 	fmt.Fprintf(w, "Verified")
@@ -165,7 +237,7 @@ func verifierHandler(w http.ResponseWriter, req *http.Request) {
 func main() {
 	http.HandleFunc("/signup", signUpHandler)
 	http.HandleFunc("/signin", signInHandler)
-	http.HandleFunc("/verify", verifierHandler)
+	http.HandleFunc("/verify", verifyHandler)
 
 	initDB()
 
