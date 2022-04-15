@@ -133,7 +133,10 @@ func SignUpHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(*users.Password), 8)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*users.Password), 8)
+	if err != nil {
+		log.Println("hashed password error")
+	}
 
 	if _, err = db.Query(
 		"insert into users (login, password, email) values ($1, $2, $3)",
