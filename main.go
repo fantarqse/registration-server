@@ -119,7 +119,7 @@ func JWTGenerator(data string) (string, time.Time, error) {
 	return tokenString, expirationTime, err
 }
 
-func signUpHandler(w http.ResponseWriter, req *http.Request) {
+func SignUpHandler(w http.ResponseWriter, req *http.Request) {
 	users := &SignUpUser{}
 	err := json.NewDecoder(req.Body).Decode(users)
 	if err != nil {
@@ -235,7 +235,7 @@ func verifyHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/signup", signUpHandler)
+	http.HandleFunc("/signup", SignUpHandler)
 	http.HandleFunc("/signin", signInHandler)
 	http.HandleFunc("/verify", verifyHandler)
 
