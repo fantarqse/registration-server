@@ -29,7 +29,7 @@ func TestSignUp(t *testing.T) {
 		},
 	}
 
-	handler := http.HandlerFunc(server.SignUpHandler)
+	handler := http.HandlerFunc(server.SignUpHandler) // need import package
 
 	for _, tc := range testCase {
 		t.Run(tc.Name, func(t *testing.T) {

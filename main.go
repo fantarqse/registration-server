@@ -170,7 +170,7 @@ func SignUpHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Sign Up")
 }
 
-func signInHandler(w http.ResponseWriter, req *http.Request) {
+func SignInHandler(w http.ResponseWriter, req *http.Request) {
 	user := &SignInUser{}
 	storedUser := &SignInUser{}
 
@@ -239,7 +239,7 @@ func verifyHandler(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	http.HandleFunc("/signup", SignUpHandler)
-	http.HandleFunc("/signin", signInHandler)
+	http.HandleFunc("/signin", SignInHandler)
 	http.HandleFunc("/verify", verifyHandler)
 
 	initDB()
