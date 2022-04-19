@@ -80,7 +80,7 @@ func (user SignInUser) validator() error {
 	return nil
 }
 
-func initDB() {
+/*func initDB() {
 	var err error
 
 	db, err = sql.Open("postgres", "user=postgres password=qwerty dbname=registration_db sslmode=disable")
@@ -88,7 +88,7 @@ func initDB() {
 		panic(err)
 	}
 	log.Println("DB connected!")
-}
+}*/
 
 func JWTVerifier(tokenString string) (jwt.MapClaims, bool, bool) {
 	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -242,7 +242,7 @@ func main() {
 	http.HandleFunc("/signin", SignInHandler)
 	http.HandleFunc("/verify", verifyHandler)
 
-	initDB()
+	//initDB()
 
 	log.Println("Server is running...")
 	if err := http.ListenAndServe(":8000", nil); err != nil {
