@@ -1,4 +1,4 @@
-package tests
+package api
 
 import (
 	"bytes"
@@ -8,11 +8,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	server "github.com/fantarqse/registrationserver"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSignUp(t *testing.T) {
+func TestRegistration(t *testing.T) {
 	testCase := []struct {
 		Name     string `json:"-"`
 		Login    string `json:"login"`
@@ -28,8 +27,8 @@ func TestSignUp(t *testing.T) {
 			Want:     200,
 		},
 	}
-
-	handler := http.HandlerFunc(server.SignUpHandler) // need import package
+	a := api{}
+	handler := http.HandlerFunc(a.registrationHandler)
 
 	for _, tc := range testCase {
 		t.Run(tc.Name, func(t *testing.T) {
