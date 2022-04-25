@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
+	"github.com/fantarqse/registrationserver/db"
 	"github.com/fantarqse/registrationserver/token"
 	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
@@ -32,9 +32,9 @@ func NewStarter(db *sql.DB) API {
 		router: router,
 	}
 
-	router.HandleFunc("registration", r.registrationHandler)
-	router.HandleFunc("authentication", r.authenticationHandler)
-	router.HandleFunc("verify", r.verifyHandler)
+	router.HandleFunc("/registration", r.registrationHandler)
+	router.HandleFunc("/authentication", r.authenticationHandler)
+	router.HandleFunc("/verify", r.verifyHandler)
 	return r
 }
 
@@ -64,26 +64,10 @@ func (a *api) registrationHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	if _, err = a.DB.Query(
-		"insert into users (login, password, email) values ($1, $2, $3)",
-		user.Login,
-		string(hashedPassword),
-		user.Email,
-	); err != nil {
+	if err := db.RegistrationRequestToDB(a.DB, *user.Login, string(hashedPassword), *user.Email); err != nil {
 		log.Printf("error: %v", err.Error())
-
-		if strings.Contains(err.Error(), "повторювані значення ключа") {
-			http.Error(w, "Username or Email is not unique.", http.StatusInternalServerError)
-			return
-
-		} else if strings.Contains(err.Error(), "порушує not-null") {
-			http.Error(w, "Username, Password and Email are required.", http.StatusInternalServerError)
-			return
-
-		} else {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	tokenString, _, err := token.JWTGeneration(*user.Login)
@@ -113,14 +97,12 @@ func (a *api) authenticationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := a.DB.QueryRow("select password from users where login=$1", user.Login)
-	if err := result.Scan(&storedUser.Password); err != nil {
+	if err := db.AuthenticationRequestToDB(a.DB, *user.Login, &storedUser.Password); err != nil {
+		log.Printf("error: %v", err.Error())
 		if err == sql.ErrNoRows {
-			log.Printf("error: %v", err.Error())
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		log.Printf("error: %v", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

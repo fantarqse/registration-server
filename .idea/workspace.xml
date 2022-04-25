@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab06bd4e-4cc8-4ab3-b62d-b6407e332815" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/api/dto.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/token/file.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/token/token.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/tests.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/registration_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,10 +55,13 @@
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests" />
+    <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\tests" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\api" />
       <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\cmd" />
