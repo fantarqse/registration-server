@@ -5,9 +5,12 @@ import (
 	"errors"
 	"log"
 	"strings"
+
+	_ "github.com/lib/pq"
 )
 
 func New() (*sql.DB, error) {
+	log.Println("info: DB was connecting")
 	return sql.Open(
 		"postgres",
 		"user=postgres password=qwerty dbname=registration_db sslmode=disable",

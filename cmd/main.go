@@ -1,14 +1,20 @@
 package main
 
 import (
-	"database/sql"
-	"github.com/fantarqse/registrationserver/api"
 	"log"
+
+	"github.com/fantarqse/registrationserver/api"
+	"github.com/fantarqse/registrationserver/db"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	var db *sql.DB
-	app := api.NewStarter(db)
+	myDB, err := db.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	app := api.NewStarter(myDB)
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}

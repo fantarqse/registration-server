@@ -11,6 +11,7 @@ import (
 	"github.com/fantarqse/registrationserver/token"
 	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
 

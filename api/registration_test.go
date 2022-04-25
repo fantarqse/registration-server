@@ -8,6 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fantarqse/registrationserver/db"
+	"github.com/gorilla/mux"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +30,13 @@ func TestRegistration(t *testing.T) {
 			Want:     200,
 		},
 	}
-	a := api{}
+
+	myDB, _ := db.New()
+	router := mux.NewRouter()
+	a := &api{
+		DB:     myDB,
+		router: router,
+	}
 	handler := http.HandlerFunc(a.registrationHandler)
 
 	for _, tc := range testCase {
