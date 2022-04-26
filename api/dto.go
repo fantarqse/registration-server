@@ -4,12 +4,10 @@ import (
 	"errors"
 	"log"
 	"regexp"
+	"unicode"
 )
 
-const (
-	emailReg    string = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-	passwordReg string = "[A-Z]+[a-z]+[^a-zA-Z]{2,}"
-)
+const emailReg string = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 
 type Validator interface {
 	Validate() error
@@ -24,14 +22,13 @@ type RegistrationUser struct {
 
 func (user *RegistrationUser) Validate() error {
 	email := regexp.MustCompile(emailReg)
-	password := regexp.MustCompile(passwordReg)
 
 	if len(*user.Login) < 3 {
 		log.Println("error: login is not valid")
 		return errors.New("error: login is too short")
 	}
 
-	if len(*user.Password) < 8 || !password.MatchString(*user.Password) {
+	if len(*user.Password) < 8 || !passwordValidate(*user.Password) {
 		log.Println("error: password is not valid")
 		return errors.New("error: password is not valid")
 	}
@@ -49,16 +46,35 @@ type AuthenticationUser struct {
 }
 
 func (user *AuthenticationUser) Validate() error {
-	password := regexp.MustCompile(passwordReg)
-
 	if len(*user.Login) < 3 {
 		log.Println("error: login is not valid!")
 		return errors.New("error: login is too short")
 	}
 
-	if len(*user.Password) < 8 || !password.MatchString(*user.Password) {
+	if len(*user.Password) < 8 || !passwordValidate(*user.Password) {
 		log.Println("error: password is not valid!")
 		return errors.New("error: password is not valid")
 	}
 	return nil
+}
+
+func passwordValidate(password string) bool {
+	var lower, upper bool
+	symbol := 0
+	for _, c := range password {
+		switch {
+		case unicode.IsNumber(c):
+			symbol++
+		case unicode.IsUpper(c):
+			upper = true
+		case unicode.IsPunct(c) || unicode.IsSymbol(c):
+			symbol++
+		case unicode.IsLower(c):
+			lower = true
+		}
+	}
+	if symbol > 1 && upper && lower {
+		return true
+	}
+	return false
 }
