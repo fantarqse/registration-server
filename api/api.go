@@ -15,7 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const authorization string = "Authorization"
+const Authorization string = "Authorization"
 
 type API interface {
 	Start() error
@@ -77,7 +77,7 @@ func (a *api) registrationHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Add(authorization, tokenString)
+	w.Header().Add(Authorization, tokenString)
 
 	fmt.Fprintf(w, "Sign Up")
 }
@@ -119,13 +119,13 @@ func (a *api) authenticationHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Add(authorization, tokenString)
+	w.Header().Add(Authorization, tokenString)
 
 	fmt.Fprintf(w, "Sign In")
 }
 
 func (a *api) verifyHandler(w http.ResponseWriter, r *http.Request) {
-	jwtToken := r.Header.Get(authorization)
+	jwtToken := r.Header.Get(Authorization)
 	claims, ok, valid := token.JWTVerification(jwtToken)
 	if ok && valid {
 		res, err := a.DB.Exec("update users set is_verified = true where login = $1", claims["login"])

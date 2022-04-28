@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab06bd4e-4cc8-4ab3-b62d-b6407e332815" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/api/authentication_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/verification_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/dto.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/dto.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/registration_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/registration_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/api.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,19 +56,23 @@
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
-    <property name="settings.editor.selected.configurable" value="watcher.settings" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/api" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="actions.on.save" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\api" />
       <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\tests" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\api\tests" />
       <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\api" />
       <recent name="C:\Users\vusteniuk\romantkachenko\registration-server\cmd" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestRegistration in github.com/fantarqse/registrationserver/api">
+  <component name="RunManager" selected="Go Test.TestVerification in github.com/fantarqse/registrationserver/api">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="registration-server" />
       <working_directory value="$PROJECT_DIR$" />
@@ -77,7 +82,7 @@
       <filePath value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRegistration in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestVerification in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="registration-server" />
       <working_directory value="$PROJECT_DIR$/api" />
       <root_directory value="$PROJECT_DIR$" />
@@ -86,10 +91,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestRegistration\E$" />
+      <pattern value="^\QTestVerification\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRegistration/Test13 in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestVerification/Test18 in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="registration-server" />
       <working_directory value="$PROJECT_DIR$/api" />
       <root_directory value="$PROJECT_DIR$" />
@@ -98,10 +103,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestRegistration\E$/^\QTest13\E$" />
+      <pattern value="^\QTestVerification\E$/^\QTest18\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRegistration/Test14 in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestVerification/Test19 in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="registration-server" />
       <working_directory value="$PROJECT_DIR$/api" />
       <root_directory value="$PROJECT_DIR$" />
@@ -110,10 +115,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestRegistration\E$/^\QTest14\E$" />
+      <pattern value="^\QTestVerification\E$/^\QTest19\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRegistration/Test6 in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestVerification/Test20 in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="registration-server" />
       <working_directory value="$PROJECT_DIR$/api" />
       <root_directory value="$PROJECT_DIR$" />
@@ -122,7 +127,19 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestRegistration\E$/^\QTest6\E$" />
+      <pattern value="^\QTestVerification\E$/^\QTest20\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestVerification/Test21 in github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="registration-server" />
+      <working_directory value="$PROJECT_DIR$/api" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/fantarqse/registrationserver/api" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestVerification\E$/^\QTest21\E$" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
@@ -135,24 +152,13 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
-    <configuration name="go test github.com/fantarqse/registrationserver/api" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="registration-server" />
-      <working_directory value="$PROJECT_DIR$/api" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/fantarqse/registrationserver/api" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestRegistration in github.com/fantarqse/registrationserver/api" />
-        <item itemvalue="Go Test.go test github.com/fantarqse/registrationserver/api" />
-        <item itemvalue="Go Test.TestRegistration/Test14 in github.com/fantarqse/registrationserver/api" />
-        <item itemvalue="Go Test.TestRegistration/Test6 in github.com/fantarqse/registrationserver/api" />
-        <item itemvalue="Go Test.TestRegistration/Test13 in github.com/fantarqse/registrationserver/api" />
+        <item itemvalue="Go Test.TestVerification in github.com/fantarqse/registrationserver/api" />
+        <item itemvalue="Go Test.TestVerification/Test21 in github.com/fantarqse/registrationserver/api" />
+        <item itemvalue="Go Test.TestVerification/Test20 in github.com/fantarqse/registrationserver/api" />
+        <item itemvalue="Go Test.TestVerification/Test19 in github.com/fantarqse/registrationserver/api" />
+        <item itemvalue="Go Test.TestVerification/Test18 in github.com/fantarqse/registrationserver/api" />
       </list>
     </recent_temporary>
   </component>
