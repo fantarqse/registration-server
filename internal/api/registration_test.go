@@ -3,12 +3,12 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/fantarqse/registrationserver/internal/db"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fantarqse/registrationserver/db"
 	"github.com/gorilla/mux"
 
 	"github.com/stretchr/testify/assert"

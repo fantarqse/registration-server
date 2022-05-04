@@ -3,18 +3,24 @@ package main
 import (
 	"log"
 
-	"github.com/fantarqse/registrationserver/api"
-	"github.com/fantarqse/registrationserver/db"
+	"github.com/fantarqse/registrationserver/internal/api"
+	"github.com/fantarqse/registrationserver/internal/config"
+	"github.com/fantarqse/registrationserver/internal/db"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	myDB, err := db.New()
+	c, err := config.NewConfig(".", ".env")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	app := api.NewStarter(myDB)
+	myDB, err := db.New(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	app := api.New(myDB)
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}
