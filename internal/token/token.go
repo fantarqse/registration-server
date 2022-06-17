@@ -2,18 +2,19 @@ package token
 
 import (
 	"fmt"
-	"github.com/golang-jwt/jwt"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
-var jwtKey = []byte("secret_key")
+var jwtKey = []byte("secret_key") //TODO: add to config
 
 type Token struct {
 	Login string `json:"login,omitempty" db:"login"`
 	jwt.StandardClaims
 }
 
-func JWTGeneration(data string) (string, time.Time, error) {
+func Generate(data string) (string, time.Time, error) {
 	expirationTime := time.Now().Add(5 * time.Minute)
 	t := &Token{
 		Login: data,
@@ -28,7 +29,7 @@ func JWTGeneration(data string) (string, time.Time, error) {
 	return tokenString, expirationTime, err
 }
 
-func JWTVerification(tokenString string) (jwt.MapClaims, bool, bool) {
+func Verify(tokenString string) (jwt.MapClaims, bool, bool) {
 	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

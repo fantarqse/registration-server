@@ -3,14 +3,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/fantarqse/registrationserver/internal/db"
+	"github.com/fantarqse/registrationserver/internal/token"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fantarqse/registrationserver/token"
-
-	"github.com/fantarqse/registrationserver/db"
 	"github.com/gorilla/mux"
 
 	"github.com/stretchr/testify/assert"
@@ -144,7 +143,7 @@ func TestVerification(t *testing.T) {
 				log.Printf("requst error: %v", err.Error())
 			}
 
-			tokenString, _, err := token.JWTGeneration(tc.Login)
+			tokenString, _, err := token.Generate(tc.Login)
 			if err != nil {
 				log.Printf("token generation error: %v", err.Error())
 			}

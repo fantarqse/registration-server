@@ -13,14 +13,14 @@ type Validator interface {
 	Validate() error
 }
 
-type RegistrationUser struct {
+type RegistrationData struct {
 	Login      *string `json:"login,omitempty" db:"login"`
 	Password   *string `json:"password,omitempty" db:"password"`
 	Email      *string `json:"email,omitempty" db:"password"`
 	IsVerified bool    `json:"isVerified,omitempty" db:"is_verified"`
 }
 
-func (user *RegistrationUser) Validate() error {
+func (user *RegistrationData) Validate() error {
 	email := regexp.MustCompile(emailReg)
 
 	if len(*user.Login) < 3 {
@@ -28,7 +28,7 @@ func (user *RegistrationUser) Validate() error {
 		return errors.New("error: login is too short")
 	}
 
-	if len(*user.Password) < 8 || !passwordValidate(*user.Password) {
+	if len(*user.Password) < 8 || !validatePassword(*user.Password) {
 		log.Println("error: password is not valid")
 		return errors.New("error: password is not valid")
 	}
@@ -40,25 +40,25 @@ func (user *RegistrationUser) Validate() error {
 	return nil
 }
 
-type AuthenticationUser struct {
+type AuthenticationData struct {
 	Login    *string `json:"login,omitempty" db:"login"`
 	Password *string `json:"password,omitempty" db:"password"`
 }
 
-func (user *AuthenticationUser) Validate() error {
+func (user *AuthenticationData) Validate() error {
 	if len(*user.Login) < 3 {
 		log.Println("error: login is not valid!")
 		return errors.New("error: login is too short")
 	}
 
-	if len(*user.Password) < 8 || !passwordValidate(*user.Password) {
+	if len(*user.Password) < 8 || !validatePassword(*user.Password) {
 		log.Println("error: password is not valid!")
 		return errors.New("error: password is not valid")
 	}
 	return nil
 }
 
-func passwordValidate(password string) bool {
+func validatePassword(password string) bool {
 	var lower, upper bool
 	symbol := 0
 	for _, c := range password {

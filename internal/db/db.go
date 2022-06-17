@@ -6,18 +6,19 @@ import (
 	"log"
 	"strings"
 
+	"github.com/fantarqse/registrationserver/internal/config"
 	_ "github.com/lib/pq"
 )
 
-func New() (*sql.DB, error) {
-	log.Println("info: DB was connecting")
+func New(c *config.Config) (*sql.DB, error) {
+	log.Println("info: DB is connecting...")
 	return sql.Open(
-		"postgres",
-		"user=postgres password=qwerty dbname=registration_db sslmode=disable",
+		c.DatabaseDriverName,
+		c.DatabaseDataSourceName,
 	)
 }
 
-func RegistrationRequestToDB(db *sql.DB, login, password, email string) error {
+func Register(db *sql.DB, login, password, email string) error {
 	if _, err := db.Query(
 		"insert into users (login, password, email) values ($1, $2, $3)",
 		login,
@@ -37,7 +38,7 @@ func RegistrationRequestToDB(db *sql.DB, login, password, email string) error {
 	return nil
 }
 
-func AuthenticationRequestToDB(db *sql.DB, login string, password **string) error {
+func Authenticate(db *sql.DB, login string, password **string) error {
 	result := db.QueryRow("select password from users where login=$1", login)
 	if err := result.Scan(password); err != nil {
 		log.Printf("error: %v", err.Error())

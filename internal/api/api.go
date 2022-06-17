@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fantarqse/registrationserver/db"
-	"github.com/fantarqse/registrationserver/token"
+	"github.com/fantarqse/registrationserver/internal/db"
+	"github.com/fantarqse/registrationserver/internal/token"
 	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -26,7 +26,7 @@ type api struct {
 	router *mux.Router
 }
 
-func NewStarter(db *sql.DB) API {
+func New(db *sql.DB) API {
 	router := mux.NewRouter()
 	r := &api{
 		DB:     db,
@@ -45,7 +45,7 @@ func (a *api) Start() error {
 }
 
 func (a *api) registrationHandler(w http.ResponseWriter, r *http.Request) {
-	user := &RegistrationUser{}
+	user := &RegistrationData{}
 
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		log.Println("error: JSON is not valid")
@@ -65,13 +65,13 @@ func (a *api) registrationHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	if err := db.RegistrationRequestToDB(a.DB, *user.Login, string(hashedPassword), *user.Email); err != nil {
+	if err := db.Register(a.DB, *user.Login, string(hashedPassword), *user.Email); err != nil {
 		log.Printf("error: %v", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	tokenString, _, err := token.JWTGeneration(*user.Login)
+	tokenString, _, err := token.Generate(*user.Login)
 	if err != nil {
 		log.Printf("error: %v", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -83,8 +83,8 @@ func (a *api) registrationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *api) authenticationHandler(w http.ResponseWriter, r *http.Request) {
-	user := &AuthenticationUser{}
-	storedUser := &AuthenticationUser{}
+	user := &AuthenticationData{}
+	storedUser := &AuthenticationData{}
 
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		log.Println("error: JSON is not valid")
@@ -98,7 +98,7 @@ func (a *api) authenticationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.AuthenticationRequestToDB(a.DB, *user.Login, &storedUser.Password); err != nil {
+	if err := db.Authenticate(a.DB, *user.Login, &storedUser.Password); err != nil {
 		log.Printf("error: %v", err.Error())
 		if err == sql.ErrNoRows {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -114,7 +114,7 @@ func (a *api) authenticationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenString, _, err := token.JWTGeneration(*user.Login)
+	tokenString, _, err := token.Generate(*user.Login)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -126,7 +126,7 @@ func (a *api) authenticationHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *api) verifyHandler(w http.ResponseWriter, r *http.Request) {
 	jwtToken := r.Header.Get(Authorization)
-	claims, ok, valid := token.JWTVerification(jwtToken)
+	claims, ok, valid := token.Verify(jwtToken)
 	if ok && valid {
 		res, err := a.DB.Exec("update users set is_verified = true where login = $1", claims["login"])
 		if err != nil {
